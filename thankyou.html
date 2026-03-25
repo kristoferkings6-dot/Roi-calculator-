@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your ROI Score - Kringstar AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 100%);
+            color: #E8E8E8;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #0066FF;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #A0A0A0;
+            margin-bottom: 40px;
+        }
+
+        /* SCORE SECTION */
+        .score-section {
+            background: linear-gradient(135deg, #0066FF, #0052CC);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .score-value {
+            font-size: 8rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-outof {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .score-status {
+            font-size: 2rem;
+            margin-top: 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-bad {
+            color: #FF6B6B;
+        }
+
+        .status-medium {
+            color: #FFD93D;
+        }
+
+        .status-good {
+            color: #51CF66;
+        }
+
+        /* LOSS CALCULATION */
+        .loss-section {
+            background: rgba(255, 107, 107, 0.15);
+            border: 3px solid rgba(255, 107, 107, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .loss-section h2 {
+            color: #FF6B6B;
+            font-size: 2rem;
+            margin-bottom: 25px;
+        }
+
+        .loss-amount {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #FF6B6B;
+            margin: 20px 0;
+            text-shadow: 0 5px 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .loss-breakdown {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+
+        .loss-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.1rem;
+        }
+
+        .loss-item:last-child {
+            border-bottom: none;
+        }
+
+        .loss-label {
+            color: #A0A0A0;
+        }
+
+        .loss-value {
+            color: white;
+            font-weight: 700;
+        }
+
+        /* NEXT STEPS */
+        .next-steps {
+            text-align: left;
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 102, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .next-steps h2 {
+            color: #0066FF;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            margin-right: 20px;
+            min-width: 50px;
+        }
+
+        .step-content h3 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+
+        .step-content p {
+            color: #A0A0A0;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* CTA BUTTONS */
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .cta-btn {
+            padding: 25px 45px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #25D366, #20BA5A);
+            color: white;
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6);
+        }
+
+        .cta-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        /* GUARANTEE */
+        .guarantee {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .guarantee h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .guarantee p {
+            color: #E8E8E8;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .score-value {
+                font-size: 5rem;
+            }
+
+            .score-outof {
+                font-size: 2rem;
+            }
+
+            .loss-amount {
+                font-size: 3rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .cta-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        
+        <div class="card">
+            <h1>Your ROI Score Is Ready!</h1>
+            <p class="subtitle">Here's exactly how your lead generation system is performing...</p>
+
+            <!-- SCORE DISPLAY -->
+            <div class="score-section">
+                <div class="score-label">Your ROI Score</div>
+                <div class="score-value">
+                    <span id="scoreDisplay">--</span>
+                    <span class="score-outof">/100</span>
+                </div>
+                <div class="score-status" id="scoreStatus">Analyzing...</div>
+            </div>
+
+            <!-- MONEY LEAK SECTION -->
+            <div class="loss-section" id="lossSection" style="display: none;">
+                <h2>💸 You're Losing This Much Monthly:</h2>
+                <div class="loss-amount" id="lossAmount">₦0</div>
+                
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; line-height: 1.7; margin: 20px 0;">
+                    Based on your answers, here's what's costing you money every month:
+                </p>
+
+                <div class="loss-breakdown">
+                    <div class="loss-item">
+                        <span class="loss-label">Wasted ad spend on unqualified leads</span>
+                        <span class="loss-value" id="wastedAds">₦0</span>
+                    </div>
+                    <div class="loss-item">
+                        <span class="loss-label">Time wasted chasing no-shows (₦5K/hour)</span>
+                        <span class="loss-value" id="wastedTime">₦0</span>
+                    </div>
+                    <div class="loss-item">
+                        <span class="loss-label">Missed deals from low appointment volume</span>
+                        <span class="loss-value" id="missedDeals">₦0</span>
+                    </div>
+                    <div class="loss-item" style="border-top: 2px solid rgba(255, 107, 107, 0.5); margin-top: 15px; padding-top: 20px; font-size: 1.3rem;">
+                        <span class="loss-label" style="color: #FF6B6B; font-weight: 700;">TOTAL MONTHLY LOSS</span>
+                        <span class="loss-value" style="color: #FF6B6B; font-size: 1.5rem;" id="totalLoss">₦0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEXT STEPS -->
+            <div class="next-steps">
+                <h2>📋 What Happens Next?</h2>
+                
+                <div class="step">
+                    <div class="step-icon">📧</div>
+                    <div class="step-content">
+                        <h3>Check Your Email (Next 2 Minutes)</h3>
+                        <p>We're sending your detailed ROI breakdown with specific recommendations for your situation.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-icon">📱</div>
+                    <div class="step-content">
+                        <h3>Let's Fix This Together</h3>
+                        <p>Message us on WhatsApp and we'll show you exactly how to plug these money leaks and 3X your appointments in 30 days.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-content">
+                        <h3>Free Strategy Call (Optional)</h3>
+                        <p>Book a 15-minute call to discuss your custom plan and see how we can fix your lead generation system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA BUTTONS -->
+            <div class="cta-buttons">
+                <a href="https://wa.me/2349037668075?text=Hi%2C%20I%20just%20got%20my%20ROI%20score.%20I%20want%20to%20fix%20my%20lead%20gen%20system." class="cta-btn cta-primary">
+                    📱 Fix This on WhatsApp
+                </a>
+                <a href="https://kristoferkings6-dot.github.io/roi-calculator/" class="cta-btn cta-secondary">
+                    🏠 Back to Homepage
+                </a>
+            </div>
+
+            <!-- GUARANTEE -->
+            <div class="guarantee">
+                <h3>⚡ Our Promise to You</h3>
+                <p>
+                    If we don't deliver 18-25 qualified appointments in your first month, 
+                    you don't pay the service fee. That's how confident we are in fixing your lead gen.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get score from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = parseInt(urlParams.get('score')) || 0;
+        
+        // Display score
+        document.getElementById('scoreDisplay').textContent = score;
+        
+        // Determine status and show appropriate message
+        let status = '';
+        let statusClass = '';
+        
+        if (score < 30) {
+            status = '🚨 MONEY LEAK ZONE';
+            statusClass = 'status-bad';
+        } else if (score < 60) {
+            status = '⚠️ IMPROVEMENT NEEDED';
+            statusClass = 'status-medium';
+        } else if (score < 80) {
+            status = '⚡ GETTING THERE';
+            statusClass = 'status-medium';
+        } else {
+            status = '✅ OPTIMIZED ZONE';
+            statusClass = 'status-good';
+        }
+        
+        const statusElement = document.getElementById('scoreStatus');
+        statusElement.textContent = status;
+        statusElement.className = 'score-status ' + statusClass;
+        
+        // Calculate money losses based on score
+        if (score < 80) {
+            // Show loss section
+            document.getElementById('lossSection').style.display = 'block';
+            
+            // Calculate losses (inverse of score - lower score = higher losses)
+            const lossMultiplier = (100 - score) / 100;
+            
+            // Base assumptions for losses
+            const wastedAds = Math.round(200000 * lossMultiplier); // Up to ₦200K wasted on bad ads
+            const wastedTime = Math.round(150000 * lossMultiplier); // Up to ₦150K in time (30 hours at ₦5K/hour)
+            const missedDeals = Math.round(2500000 * lossMultiplier); // Up to ₦2.5M in missed deals
+            const totalLoss = wastedAds + wastedTime + missedDeals;
+            
+            // Format and display
+            document.getElementById('wastedAds').textContent = '₦' + wastedAds.toLocaleString();
+            document.getElementById('wastedTime').textContent = '₦' + wastedTime.toLocaleString();
+            document.getElementById('missedDeals').textContent = '₦' + missedDeals.toLocaleString();
+            document.getElementById('totalLoss').textContent = '₦' + totalLoss.toLocaleString();
+            document.getElementById('lossAmount').textContent = '₦' + totalLoss.toLocaleString();
+        }
+    </script>
+</body>
+</html>
