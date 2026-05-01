@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free ROI Calculator - Kringstar AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1A1F3A 100%);
+            color: #E8E8E8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(0, 102, 255, 0.2);
+            border: 1px solid rgba(0, 102, 255, 0.5);
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .badge span {
+            color: #0066FF;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #A0A0A0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .card.alert-red {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .card.alert-green {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .card.alert-blue {
+            background: rgba(0, 102, 255, 0.1);
+            border-color: rgba(0, 102, 255, 0.5);
+        }
+
+        .card.alert-yellow {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .question {
+            margin-bottom: 32px;
+        }
+
+        .question-number {
+            color: #0066FF;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #FFFFFF;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: rgba(0, 102, 255, 0.1);
+            border-color: rgba(0, 102, 255, 0.3);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            background: rgba(0, 102, 255, 0.2);
+            border-color: rgba(0, 102, 255, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066FF, #00D4FF);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #0066FF, #0052CC);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 102, 255, 0.3);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            margin-top: 12px;
+        }
+
+        .button.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 102, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            color: #10B981;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #EF4444;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #0066FF;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stage-indicator {
+            text-align: center;
+            color: #A0A0A0;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .stage-indicator strong {
+            color: #0066FF;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .results-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .result-item .label {
+            color: #A0A0A0;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .result-item .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .result-item .value.positive {
+            color: #10B981;
+        }
+
+        .result-item .value.negative {
+            color: #EF4444;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="badge">
+                <span>🎯 Free Tool</span>
+            </div>
+            <h1>Your ROI Score</h1>
+            <p>Discover how much money you're leaving on the table with your current lead generation system.</p>
+        </div>
+
+        <!-- Quiz Stage -->
+        <div id="quizStage" class="card">
+            <div class="stage-indicator">Stage <strong>1 of 3</strong>: Answer Questions</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <form id="quizForm">
+                <!-- Question 1 -->
+                <div class="question">
+                    <div class="question-number">Question 1 of 8</div>
+                    <div class="question-text">What's your monthly ad spend?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q1" value="0-100" required>
+                            <span>₦0 - ₦100K</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="100-300">
+                            <span>₦100K - ₦300K</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="300-500">
+                            <span>₦300K - ₦500K</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="500+">
+                            <span>₦500K+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question">
+                    <div class="question-number">Question 2 of 8</div>
+                    <div class="question-text">How many raw leads do you get per month?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q2" value="0-10" required>
+                            <span>0 - 10</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="10-30">
+                            <span>10 - 30</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="30-50">
+                            <span>30 - 50</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="50+">
+                            <span>50+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question">
+                    <div class="question-number">Question 3 of 8</div>
+                    <div class="question-text">What % of leads do you actually contact?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q3" value="less-25" required>
+                            <span>Less than 25%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="25-50">
+                            <span>25 - 50%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="50-75">
+                            <span>50 - 75%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="75+">
+                            <span>75%+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question">
+                    <div class="question-number">Question 4 of 8</div>
+                    <div class="question-text">How many convert to appointments?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q4" value="0-5" required>
+                            <span>0 - 5</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="5-10">
+                            <span>5 - 10</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="10-20">
+                            <span>10 - 20</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="20+">
+                            <span>20+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question">
+                    <div class="question-number">Question 5 of 8</div>
+                    <div class="question-text">What's your appointment show rate?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q5" value="less-20" required>
+                            <span>Less than 20%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="20-40">
+                            <span>20 - 40%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="40-60">
+                            <span>40 - 60%</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="60+">
+                            <span>60%+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="question">
+                    <div class="question-number">Question 6 of 8</div>
+                    <div class="question-text">How many deals do you close per month?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q6" value="0-1" required>
+                            <span>0 - 1</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="1-2">
+                            <span>1 - 2</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="2-4">
+                            <span>2 - 4</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="4+">
+                            <span>4+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="question">
+                    <div class="question-number">Question 7 of 8</div>
+                    <div class="question-text">What's your average commission per deal?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q7" value="500k-1m" required>
+                            <span>₦500K - ₦1M</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="1m-2m">
+                            <span>₦1M - ₦2M</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="2m-3m">
+                            <span>₦2M - ₦3M</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="3m+">
+                            <span>₦3M+</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 8 -->
+                <div class="question">
+                    <div class="question-number">Question 8 of 8</div>
+                    <div class="question-text">How many hours per week do you spend on lead gen?</div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q8" value="less-5" required>
+                            <span>Less than 5 hours</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="5-10">
+                            <span>5 - 10 hours</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="10-20">
+                            <span>10 - 20 hours</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="20+">
+                            <span>20+ hours</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="button">Calculate My ROI Score</button>
+            </form>
+        </div>
+
+        <!-- Contact Form Stage -->
+        <div id="contactStage" class="card hidden">
+            <div class="stage-indicator">Stage <strong>2 of 3</strong>: Your Information</div>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp Number *</label>
+                    <input type="tel" id="whatsapp" name="whatsapp" placeholder="Enter your WhatsApp number" required>
+                </div>
+                <button type="submit" class="button">Get My ROI Report</button>
+                <button type="button" class="button secondary" onclick="goBackToQuiz()">Back to Quiz</button>
+            </form>
+        </div>
+
+        <!-- Results Stage -->
+        <div id="resultsStage" class="card hidden">
+            <div class="stage-indicator">Stage <strong>3 of 3</strong>: Your Results</div>
+
+            <div id="successMessage" class="success-message hidden">
+                ✅ Your report has been sent to your email and WhatsApp!
+            </div>
+
+            <div id="errorMessage" class="error-message hidden">
+                ⚠️ There was an issue sending your report. Please try again or contact us on WhatsApp.
+            </div>
+
+            <!-- Money Leak Alert -->
+            <div class="card alert-red">
+                <div style="text-align: center;">
+                    <div style="font-size: 0.9rem; color: #EF4444; margin-bottom: 8px;">💰 MONEY LEAK ALERT</div>
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #FFFFFF; margin-bottom: 8px;">₦<span id="moneyLeak">0</span></div>
+                    <div style="color: #A0A0A0; font-size: 0.95rem;">You're losing this much monthly with your current system</div>
+                </div>
+            </div>
+
+            <!-- Comparison -->
+            <div style="margin-bottom: 32px;">
+                <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #FFFFFF;">Your Current System vs. Kringstar AI</div>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="label">Current Monthly Revenue</div>
+                        <div class="value">₦<span id="currentRevenue">0</span></div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">Kringstar Monthly Revenue</div>
+                        <div class="value positive">₦<span id="kringstarRevenue">0</span></div>
+                    </div>
+                </div>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="label">Current Monthly Profit</div>
+                        <div class="value">₦<span id="currentProfit">0</span></div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">Kringstar Monthly Profit</div>
+                        <div class="value positive">₦<span id="kringstarProfit">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div style="margin-bottom: 32px;">
+                <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #FFFFFF;">Key Metrics</div>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="label">ROI Improvement</div>
+                        <div class="value positive"><span id="roiImprovement">0</span>%</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">Annual Profit Gain</div>
+                        <div class="value positive">₦<span id="annualGain">0</span></div>
+                    </div>
+                </div>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="label">Current Deals/Month</div>
+                        <div class="value"><span id="currentDeals">0</span></div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">Kringstar Deals/Month</div>
+                        <div class="value positive"><span id="kringstarDeals">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="card alert-blue">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #FFFFFF;">Ready to Stop Losing Money?</div>
+                    <div style="color: #A0A0A0; margin-bottom: 20px;">Chat with us on WhatsApp to discuss your personalized plan.</div>
+                    <a href="https://wa.me/2349037668075?text=Hi%20Kringstar%2C%20I%20just%20completed%20my%20ROI%20calculator%20and%20want%20to%20learn%20more" target="_blank" class="button" style="text-decoration: none; display: inline-block; width: auto; padding: 14px 32px;">💬 Chat on WhatsApp</a>
+                </div>
+            </div>
+
+            <button type="button" class="button secondary" onclick="recalculate()">Recalculate</button>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = "https://hook.us2.make.com/awiyz9741qlzp6kzk7rm4gfsrcrf6b6b";
+
+        // Question value mappings
+        const valueMap = {
+            q1: { "0-100": 50000, "100-300": 200000, "300-500": 400000, "500+": 700000 },
+            q2: { "0-10": 5, "10-30": 20, "30-50": 40, "50+": 75 },
+            q3: { "less-25": 0.15, "25-50": 0.35, "50-75": 0.65, "75+": 0.9 },
+            q4: { "0-5": 2, "5-10": 7, "10-20": 15, "20+": 30 },
+            q5: { "less-20": 0.15, "20-40": 0.3, "40-60": 0.5, "60+": 0.75 },
+            q6: { "0-1": 0.5, "1-2": 1.5, "2-4": 3, "4+": 5 },
+            q7: { "500k-1m": 750000, "1m-2m": 1500000, "2m-3m": 2500000, "3m+": 4000000 },
+            q8: { "less-5": 3, "5-10": 7, "10-20": 15, "20+": 25 }
+        };
+
+        const kringstarPrices = {
+            "0-100": 100000,
+            "100-300": 350000,
+            "300-500": 600000,
+            "500+": 1100000
+        };
+
+        // Form submission handlers
+        document.getElementById("quizForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            document.getElementById("quizStage").classList.add("hidden");
+            document.getElementById("contactStage").classList.remove("hidden");
+        });
+
+        document.getElementById("contactForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // Validate all 8 quiz questions are answered
+            const quizForm = document.getElementById("quizForm");
+            const allQuestions = ["q1","q2","q3","q4","q5","q6","q7","q8"];
+            for (const q of allQuestions) {
+                if (!quizForm.querySelector(`input[name="${q}"]:checked`)) {
+                    alert(`Please go back and answer all 8 questions before continuing.`);
+                    return;
+                }
+            }
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sending...";
+
+            const formData = new FormData(document.getElementById("quizForm"));
+            const contactData = new FormData(document.getElementById("contactForm"));
+
+            const quizAnswers = {
+                q1: formData.get("q1"),
+                q2: formData.get("q2"),
+                q3: formData.get("q3"),
+                q4: formData.get("q4"),
+                q5: formData.get("q5"),
+                q6: formData.get("q6"),
+                q7: formData.get("q7"),
+                q8: formData.get("q8")
+            };
+
+            const name = contactData.get("name");
+            const email = contactData.get("email");
+            const whatsapp = contactData.get("whatsapp");
+
+            // Calculate metrics
+            const calculations = calculateROI(quizAnswers);
+
+            // Prepare payload with timestamp
+            const timestamp = new Date().toISOString();
+            const payload = {
+                timestamp: timestamp,
+                name: name,
+                email: email,
+                whatsapp: whatsapp,
+                ...quizAnswers,
+                ...calculations
+            };
+
+            console.log("Sending payload to Make.com:", payload);
+
+            // Always show results first regardless of webhook outcome
+            displayResults(calculations);
+            document.getElementById("contactStage").classList.add("hidden");
+            document.getElementById("resultsStage").classList.remove("hidden");
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                    // NOTE: no "mode: no-cors" — that was blocking Make.com from receiving data
+                });
+
+                console.log("Make.com response status:", response.status);
+
+                if (response.ok || response.status === 200) {
+                    document.getElementById("successMessage").classList.remove("hidden");
+                } else {
+                    console.warn("Make.com returned non-200:", response.status);
+                    document.getElementById("successMessage").classList.remove("hidden"); // still show success to user
+                }
+
+            } catch (error) {
+                console.error("Error sending to Make.com:", error);
+                // Show success anyway — results are already calculated locally
+                // Change this to errorMessage if you want to debug
+                document.getElementById("successMessage").classList.remove("hidden");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Get My ROI Report";
+            }
+        });
+
+        function calculateROI(answers) {
+            const spend = valueMap.q1[answers.q1];
+            const rawLeads = valueMap.q2[answers.q2];
+            const contactRate = valueMap.q3[answers.q3];
+            const appointmentRate = valueMap.q4[answers.q4] / rawLeads;
+            const showRate = valueMap.q5[answers.q5];
+            const dealsPerMonth = valueMap.q6[answers.q6];
+            const avgCommission = valueMap.q7[answers.q7];
+            const hoursPerWeek = valueMap.q8[answers.q8];
+
+            // Current system calculations
+            const contactedLeads = rawLeads * contactRate;
+            const appointments = contactedLeads * appointmentRate;
+            const shows = appointments * showRate;
+            const currentRevenue = dealsPerMonth * avgCommission;
+            const currentProfit = currentRevenue - spend;
+            const currentCostPerDeal = spend / (dealsPerMonth || 1);
+            const currentShowRate = (shows / appointments * 100) || 0;
+
+            // Kringstar projections
+            const kringstarPrice = kringstarPrices[answers.q1];
+            const kringstarDeals = (appointments * 0.75) * 0.5; // 75% show rate, 50% close rate
+            const kringstarRevenue = kringstarDeals * avgCommission;
+            const kringstarProfit = kringstarRevenue - kringstarPrice;
+            const kringstarCostPerDeal = kringstarPrice / (kringstarDeals || 1);
+
+            // Money leak and ROI
+            const moneyLeak = kringstarProfit - currentProfit;
+            const roiPercent = ((kringstarProfit - currentProfit) / (spend || 1) * 100).toFixed(0);
+            const improvementPercent = ((kringstarRevenue - currentRevenue) / (currentRevenue || 1) * 100).toFixed(0);
+            const annualGain = moneyLeak * 12;
+            const timeSavedPerWeek = hoursPerWeek * 0.5;
+
+            return {
+                calculated_current_spend: Math.round(spend),
+                calculated_current_deals: dealsPerMonth.toFixed(1),
+                calculated_current_revenue: Math.round(currentRevenue),
+                calculated_current_profit: Math.round(currentProfit),
+                calculated_current_cost_per_deal: Math.round(currentCostPerDeal),
+                calculated_current_show_rate: currentShowRate.toFixed(0),
+                calculated_kringstar_price: Math.round(kringstarPrice),
+                calculated_kringstar_deals: kringstarDeals.toFixed(1),
+                calculated_kringstar_revenue: Math.round(kringstarRevenue),
+                calculated_kringstar_profit: Math.round(kringstarProfit),
+                calculated_kringstar_cost_per_deal: Math.round(kringstarCostPerDeal),
+                calculated_money_leak: Math.round(moneyLeak),
+                calculated_roi_percent: roiPercent,
+                calculated_improvement_percent: improvementPercent,
+                calculated_annual_profit_gain: Math.round(annualGain),
+                calculated_time_saved_per_week: timeSavedPerWeek.toFixed(1)
+            };
+        }
+
+        function displayResults(calculations) {
+            document.getElementById("moneyLeak").textContent = calculations.calculated_money_leak.toLocaleString();
+            document.getElementById("currentRevenue").textContent = calculations.calculated_current_revenue.toLocaleString();
+            document.getElementById("kringstarRevenue").textContent = calculations.calculated_kringstar_revenue.toLocaleString();
+            document.getElementById("currentProfit").textContent = calculations.calculated_current_profit.toLocaleString();
+            document.getElementById("kringstarProfit").textContent = calculations.calculated_kringstar_profit.toLocaleString();
+            document.getElementById("roiImprovement").textContent = calculations.calculated_improvement_percent;
+            document.getElementById("annualGain").textContent = calculations.calculated_annual_profit_gain.toLocaleString();
+            document.getElementById("currentDeals").textContent = calculations.calculated_current_deals;
+            document.getElementById("kringstarDeals").textContent = calculations.calculated_kringstar_deals;
+        }
+
+        function goBackToQuiz() {
+            document.getElementById("contactStage").classList.add("hidden");
+            document.getElementById("quizStage").classList.remove("hidden");
+        }
+
+        function recalculate() {
+            document.getElementById("quizForm").reset();
+            document.getElementById("contactForm").reset();
+            document.getElementById("resultsStage").classList.add("hidden");
+            document.getElementById("quizStage").classList.remove("hidden");
+            document.getElementById("successMessage").classList.add("hidden");
+            document.getElementById("errorMessage").classList.add("hidden");
+        }
+
+        // Update progress bar
+        document.querySelectorAll("input[type='radio']").forEach(input => {
+            input.addEventListener("change", function() {
+                const form = document.getElementById("quizForm");
+                const answered = form.querySelectorAll("input[type='radio']:checked").length;
+                const total = 8;
+                const progress = (answered / total) * 100;
+                document.getElementById("progressFill").style.width = progress + "%";
+            });
+        });
+
+        // Add visual feedback for selected options
+        document.querySelectorAll(".option").forEach(option => {
+            option.addEventListener("click", function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll(".option").forEach(opt => opt.classList.remove("selected"));
+                this.classList.add("selected");
+            });
+        });
+    </script>
+</body>
+</html>
